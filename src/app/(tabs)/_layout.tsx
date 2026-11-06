@@ -14,8 +14,7 @@ export default function TabsLayout() {
         // Navegación inferior
         tabBarActiveTintColor: theme.text,
         tabBarInactiveTintColor: theme.tabInactive,
-        tabBarStyle: { backgroundColor: theme.background },
-      }}
+        tabBarStyle: { backgroundColor: theme.background },      }}
     >
       <Tabs.Screen
         name="index"
