@@ -39,3 +39,22 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Project conventions
+
+- **Language:** file names, identifiers, types, route names and enum/string keys in **English**. Code **comments and docs in Spanish**. User-facing UI text stays in Spanish.
+- **Architecture:** feature-first, see `ARCHITECTURE.md`. `src/app/` holds only thin routes; logic lives in `src/features/<feature>/{components,hooks,lib}`; shared tokens in `src/shared/`. A feature must not import from another feature; `lib/` must not import React.
+- **Verify before finishing:** `npx tsc --noEmit` and `npx expo lint` (both must exit 0).
+- **3D model:** `assets/models/tshirt.glb` is optimized (~65k triangles) and must NOT use Draco or mesh quantization (the measurement code reads raw Float32 positions). Positions arrive interleaved with normals; `analyzeShirt` flattens them.
+- **Formatting:** a hook runs Prettier after every Edit/Write (`.claude/hooks/format.js`).
+
+## Auto-routing (use without being asked, keep tokens low)
+
+- New screen/tab/feature -> skill `new-feature`. Heavy/slow `.glb` -> skill `optimize-glb`.
+- Know the layout from `ARCHITECTURE.md`; open only the file you will change (Grep first, then Read with offset/limit).
+- Edit with small diffs; do not re-read files you just wrote; run `tsc` + `lint` once at the end.
+- No subagents for tasks in a single feature; only for broad searches across many files.
+
+## Quick map (so you don't need to open ARCHITECTURE.md)
+
+All paths under `src/features/design/`: `DesignScreen.tsx` (screen state) · `constants.ts` (limits, colors, fabric options, model) · `types.ts` · `components/` ShirtCanvas (lights, Canvas, loading) · ShirtModel (3D mesh) · FabricPanel · MeasurementsPanel · LightToggle · `hooks/` useMeasurements · useOrbitGestures · useCanvasLifecycle · `lib/` shirt-geometry (measure deformation) · fabric-textures · materials · measurements (validation). Routes: `src/app/(tabs)/{index,design}.tsx`, tabs in `(tabs)/_layout.tsx`. Theme: `src/shared/theme.ts`.

@@ -1,5 +1,38 @@
 {
   "enabledPlugins": {
     "expo@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit*)",
+      "Bash(npx expo lint*)",
+      "Bash(npx eslint *)",
+      "Bash(npx prettier *)",
+      "Bash(npx expo install --check*)",
+      "Bash(npx expo-doctor*)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Ruteo: pantalla/pestana/seccion nueva -> skill new-feature | modelo .glb pesado/lento -> skill optimize-glb | medidas/deformacion -> design/lib/shirt-geometry.ts | tela/color -> design/constants.ts + lib/fabric-textures.ts | gestos -> hooks/useOrbitGestures.ts | luces/escena -> components/ShirtCanvas.tsx. El mapa del proyecto esta en AGENTS.md: no releas ARCHITECTURE.md.'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format.js\""
+          }
+        ]
+      }
+    ]
   }
 }
