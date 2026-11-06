@@ -1,5 +1,5 @@
 import { MutableRefObject, useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber/native";
+import { useFrame, useThree } from "@react-three/fiber/native";
 import { useGLTF } from "@react-three/drei/native";
 import * as THREE from "three";
 
@@ -62,7 +62,11 @@ export function ShirtModel({
     return { scale: 2 / max, offset: center.multiplyScalar(-1) };
   }, [scene]);
 
-  useFrame(() => {
+  // Con frameloop="demand": cada render de React (medidas, tela, brillo) pide un frame.
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => invalidate());
+
+  useFrame(({ invalidate: next }) => {
     const t = target.current;
     if (t.values && appliedVersion.current !== t.version) {
       applyMeasures(info, t.values);
@@ -74,7 +78,10 @@ export function ShirtModel({
     g.rotation.x = control.current.rotX;
     g.scale.setScalar(scale * control.current.zoom);
     // Avisa que ya se dibujó (tras unos frames) para quitar el loading
-    if (frames.current < 3 && ++frames.current === 3) onReady();
+    if (frames.current < 3) {
+      if (++frames.current === 3) onReady();
+      else next(); // en modo demand hay que pedir los frames de calentamiento
+    }
   });
 
   return (

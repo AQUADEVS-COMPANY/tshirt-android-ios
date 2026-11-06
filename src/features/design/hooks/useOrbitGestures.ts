@@ -11,7 +11,10 @@ const ROTATE_SPEED = 0.01;
  * Gestos para mover el polo: un dedo gira, dos dedos (pellizco) hacen zoom.
  * El resultado se guarda en `control` (ref) que el Canvas lee en cada frame.
  */
-export function useOrbitGestures() {
+export function useOrbitGestures(onChange?: () => void) {
+  // Ref para no recrear el PanResponder cuando cambia el callback
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const control = useRef<OrbitControl>({ rotY: 0, rotX: 0, zoom: 1 });
   const last = useRef({ x: 0, y: 0, dist: 0, touches: 0 });
 
@@ -49,6 +52,7 @@ export function useOrbitGestures() {
           l.dist = 0;
         }
         l.touches = t.length;
+        onChangeRef.current?.(); // pide un nuevo frame (frameloop="demand")
       },
       onPanResponderRelease: reset,
       onPanResponderTerminate: reset,
